@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "name": "ข้าวมันไก่ประตูน้ำ",
+    "category": "อาหารไทย",
+    "description": "ข้าวมันไก่หอม นุ่ม น้ำจิ้มรสเด็ด",
+    "location": "เชียงใหม่",
+    "priceRange": 2,
+    "image": "https://picsum.photos/300",
+    "phone": "081-234-5678",
+    "openHours": "08:00 - 20:00",
+    "averageRating": 4.5,
+    "totalReviews": 12
+  }
+]
