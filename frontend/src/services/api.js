@@ -7,8 +7,10 @@ export const getRestaurants = async (filters = {}) => {
     if (filters.category) queryParams.append('category', filters.category);
     if (filters.minRating) queryParams.append('minRating', filters.minRating);
     if (filters.priceRange) queryParams.append('priceRange', filters.priceRange);
-    const url = `${API_URL}/restaurants${queryParams.toString() ? `?${queryParams}` : ''}`;
+
+    const url = `${API_URL}/restaurants?${queryParams.toString()}`;
     const response = await fetch(url);
+
     if (!response.ok) throw new Error('Failed to fetch restaurants');
     return await response.json();
   } catch (error) {
@@ -20,7 +22,7 @@ export const getRestaurants = async (filters = {}) => {
 export const getRestaurantById = async (id) => {
   try {
     const response = await fetch(`${API_URL}/restaurants/${id}`);
-    if (!response.ok) throw new Error('Failed to fetch restaurant');
+    if (!response.ok) throw new Error('Failed to fetch restaurant details');
     return await response.json();
   } catch (error) {
     console.error('API Error:', error);
@@ -35,10 +37,12 @@ export const addReview = async (reviewData) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reviewData)
     });
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || (errorData.errors ? errorData.errors.join(', ') : 'Failed to add review'));
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to add review');
     }
+
     return await response.json();
   } catch (error) {
     console.error('API Error:', error);

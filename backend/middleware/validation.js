@@ -15,6 +15,7 @@ const validateReview = (req, res, next) => {
     errors.push('รหัสร้านต้องมากกว่า 0');
   }
 
+  // ตรวจ userName
   if (!userName || !userName.trim()) {
     errors.push('กรุณากรอกชื่อ');
   } else if (userName.trim().length < 2) {
@@ -25,13 +26,15 @@ const validateReview = (req, res, next) => {
     errors.push('ชื่อมีอักขระที่ไม่อนุญาต');
   }
 
+  // ตรวจ rating
   const ratingNum = parseInt(rating);
-  if (rating === undefined || rating === null || rating === '') {
+  if (!rating) {
     errors.push('กรุณาเลือกคะแนน');
   } else if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
     errors.push('คะแนนต้องอยู่ระหว่าง 1-5');
   }
 
+  // ตรวจ comment
   if (!comment || !comment.trim()) {
     errors.push('กรุณากรอกความคิดเห็น');
   } else if (comment.trim().length < 10) {

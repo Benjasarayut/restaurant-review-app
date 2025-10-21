@@ -2,35 +2,36 @@ const express = require('express');
 const router = express.Router();
 const { readJsonFile } = require('../utils/fileManager');
 
+// ========================================
+// GET /api/restaurants - ดึงรายการร้านทั้งหมด (พร้อม filtering)
+// ========================================
 router.get('/', async (req, res) => {
   try {
     let restaurants = await readJsonFile('restaurants.json');
     const { search, category, minRating, priceRange } = req.query;
 
+    // 1. search filter
     if (search) {
-      const s = search.toLowerCase();
+      const searchLower = search.toLowerCase();
       restaurants = restaurants.filter(r =>
-        (r.name || '').toLowerCase().includes(s) ||
-        (r.description || '').toLowerCase().includes(s)
+        r.name.toLowerCase().includes(searchLower) ||
+        r.description.toLowerCase().includes(searchLower)
       );
     }
 
-    if (category && category.trim() !== '') {
+    // 2. category filter
+    if (category) {
       restaurants = restaurants.filter(r => r.category === category);
     }
 
-    if (minRating !== undefined && minRating !== '') {
-      const mr = parseFloat(minRating);
-      if (!isNaN(mr)) {
-        restaurants = restaurants.filter(r => (r.averageRating || 0) >= mr);
-      }
+    // 3. minRating filter
+    if (minRating) {
+      restaurants = restaurants.filter(r => r.averageRating >= parseFloat(minRating));
     }
 
-    if (priceRange !== undefined && priceRange !== '') {
-      const pr = parseInt(priceRange);
-      if (!isNaN(pr)) {
-        restaurants = restaurants.filter(r => parseInt(r.priceRange) === pr);
-      }
+    // 4. priceRange filter
+    if (priceRange) {
+      restaurants = restaurants.filter(r => r.priceRange === parseInt(priceRange));
     }
 
     res.json({
@@ -53,6 +54,9 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ========================================
+// GET /api/restaurants/:id - ดึงข้อมูลร้านตาม ID พร้อมรีวิว
+// ========================================
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -61,7 +65,10 @@ router.get('/:id', async (req, res) => {
 
     const restaurant = restaurants.find(r => r.id === parseInt(id));
     if (!restaurant) {
-      return res.status(404).json({ success: false, message: 'ไม่พบร้านอาหารนี้' });
+      return res.status(404).json({
+        success: false,
+        message: 'ไม่พบร้านอาหารนี้'
+      });
     }
 
     const restaurantReviews = reviews
@@ -70,7 +77,10 @@ router.get('/:id', async (req, res) => {
 
     res.json({
       success: true,
-      data: { ...restaurant, reviews: restaurantReviews }
+      data: {
+        ...restaurant,
+        reviews: restaurantReviews
+      }
     });
   } catch (error) {
     console.error('Error fetching restaurant:', error);

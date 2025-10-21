@@ -3,6 +3,9 @@ const router = express.Router();
 const { readJsonFile, writeJsonFile } = require('../utils/fileManager');
 const { validateReview } = require('../middleware/validation');
 
+// ========================================
+// GET /api/reviews/:restaurantId - ดึงรีวิวทั้งหมดของร้านนั้น
+// ========================================
 router.get('/:restaurantId', async (req, res) => {
   try {
     const { restaurantId } = req.params;
@@ -26,6 +29,9 @@ router.get('/:restaurantId', async (req, res) => {
   }
 });
 
+// ========================================
+// POST /api/reviews - เพิ่มรีวิวใหม่
+// ========================================
 router.post('/', validateReview, async (req, res) => {
   try {
     const { restaurantId, userName, rating, comment, visitDate } = req.body;
@@ -33,9 +39,12 @@ router.post('/', validateReview, async (req, res) => {
     const reviews = await readJsonFile('reviews.json');
     const restaurants = await readJsonFile('restaurants.json');
 
-    const restaurantIndex = restaurants.findIndex(r => r.id === parseInt(restaurantId));
-    if (restaurantIndex === -1) {
-      return res.status(404).json({ success: false, message: 'ไม่พบร้านอาหารนี้' });
+    const restaurant = restaurants.find(r => r.id === parseInt(restaurantId));
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        message: 'ไม่พบร้านอาหารนี้'
+      });
     }
 
     const newReview = {
@@ -51,26 +60,26 @@ router.post('/', validateReview, async (req, res) => {
     reviews.push(newReview);
     await writeJsonFile('reviews.json', reviews);
 
+    // อัพเดทค่า rating และ totalReviews
     const restaurantReviews = reviews.filter(r => r.restaurantId === parseInt(restaurantId));
     const totalRating = restaurantReviews.reduce((sum, r) => sum + r.rating, 0);
     const newAverageRating = totalRating / restaurantReviews.length;
 
+    const restaurantIndex = restaurants.findIndex(r => r.id === parseInt(restaurantId));
     restaurants[restaurantIndex].averageRating = Math.round(newAverageRating * 10) / 10;
     restaurants[restaurantIndex].totalReviews = restaurantReviews.length;
 
     await writeJsonFile('restaurants.json', restaurants);
-
-    const updated = restaurants[restaurantIndex];
 
     res.status(201).json({
       success: true,
       message: 'เพิ่มรีวิวสำเร็จ',
       data: newReview,
       restaurant: {
-        id: updated.id,
-        name: updated.name,
-        averageRating: updated.averageRating,
-        totalReviews: updated.totalReviews
+        id: restaurants[restaurantIndex].id,
+        name: restaurants[restaurantIndex].name,
+        averageRating: restaurants[restaurantIndex].averageRating,
+        totalReviews: restaurants[restaurantIndex].totalReviews
       }
     });
   } catch (error) {

@@ -6,21 +6,35 @@ function ReviewForm({ restaurantId, onReviewAdded }) {
     userName: '',
     rating: 5,
     comment: '',
-    visitDate: new Date().toISOString().split('T')[0]
+    visitDate: new Date().toISOString().split('T')[0],
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.userName.trim()) newErrors.userName = 'กรุณากรอกชื่อ';
-    else if (formData.userName.trim().length < 2) newErrors.userName = 'ชื่อต้องมีอย่างน้อย 2 ตัวอักษร';
-    else if (formData.userName.trim().length > 50) newErrors.userName = 'ชื่อต้องไม่เกิน 50 ตัวอักษร';
+
+    if (!formData.userName.trim()) {
+      newErrors.userName = 'กรุณากรอกชื่อ';
+    } else if (formData.userName.trim().length < 2) {
+      newErrors.userName = 'ชื่อต้องมีอย่างน้อย 2 ตัวอักษร';
+    } else if (formData.userName.trim().length > 50) {
+      newErrors.userName = 'ชื่อต้องไม่เกิน 50 ตัวอักษร';
+    }
+
     const ratingNum = parseInt(formData.rating);
-    if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) newErrors.rating = 'คะแนนต้องอยู่ระหว่าง 1-5';
-    if (!formData.comment.trim()) newErrors.comment = 'กรุณากรอกความคิดเห็น';
-    else if (formData.comment.trim().length < 10) newErrors.comment = 'ความคิดเห็นต้องมีอย่างน้อย 10 ตัวอักษร';
-    else if (formData.comment.trim().length > 500) newErrors.comment = 'ความคิดเห็นต้องไม่เกิน 500 ตัวอักษร';
+    if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+      newErrors.rating = 'คะแนนต้องอยู่ระหว่าง 1-5';
+    }
+
+    if (!formData.comment.trim()) {
+      newErrors.comment = 'กรุณากรอกความคิดเห็น';
+    } else if (formData.comment.trim().length < 10) {
+      newErrors.comment = 'ความคิดเห็นต้องมีอย่างน้อย 10 ตัวอักษร';
+    } else if (formData.comment.trim().length > 500) {
+      newErrors.comment = 'ความคิดเห็นต้องไม่เกิน 500 ตัวอักษร';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -28,17 +42,27 @@ function ReviewForm({ restaurantId, onReviewAdded }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+
     try {
       setSubmitting(true);
-      const result = await addReview({ restaurantId, ...formData, rating: parseInt(formData.rating) });
+      const result = await addReview({
+        restaurantId,
+        ...formData,
+        rating: parseInt(formData.rating)
+      });
+
       if (result.success) {
         alert('เพิ่มรีวิวสำเร็จ! ขอบคุณสำหรับความคิดเห็น');
-        setFormData({ userName: '', rating: 5, comment: '', visitDate: new Date().toISOString().split('T')[0] });
+        setFormData({
+          userName: '',
+          rating: 5,
+          comment: '',
+          visitDate: new Date().toISOString().split('T')[0],
+        });
         setErrors({});
-        onReviewAdded && onReviewAdded();
+        if (onReviewAdded) onReviewAdded();
       }
     } catch (error) {
-      console.error('Error adding review:', error);
       alert(error.message || 'เกิดข้อผิดพลาดในการส่งรีวิว กรุณาลองใหม่อีกครั้ง');
     } finally {
       setSubmitting(false);
@@ -51,12 +75,22 @@ function ReviewForm({ restaurantId, onReviewAdded }) {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>ชื่อของคุณ *</label>
-          <input type="text" value={formData.userName} onChange={(e) => setFormData({ ...formData, userName: e.target.value })} placeholder="กรอกชื่อ-นามสกุล" className={errors.userName ? 'invalid' : ''}/>
+          <input
+            type="text"
+            value={formData.userName}
+            onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
+            className={errors.userName ? 'invalid' : ''}
+          />
           {errors.userName && <span className="error">{errors.userName}</span>}
         </div>
+
         <div className="form-group">
           <label>คะแนน *</label>
-          <select value={formData.rating} onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) })} className={errors.rating ? 'invalid' : ''}>
+          <select
+            value={formData.rating}
+            onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) })}
+            className={errors.rating ? 'invalid' : ''}
+          >
             <option value="5">⭐⭐⭐⭐⭐ ดีเยี่ยม</option>
             <option value="4">⭐⭐⭐⭐ ดีมาก</option>
             <option value="3">⭐⭐⭐ ดี</option>
@@ -65,19 +99,35 @@ function ReviewForm({ restaurantId, onReviewAdded }) {
           </select>
           {errors.rating && <span className="error">{errors.rating}</span>}
         </div>
+
         <div className="form-group">
           <label>ความคิดเห็น *</label>
-          <textarea value={formData.comment} onChange={(e) => setFormData({ ...formData, comment: e.target.value })} placeholder="เล่าประสบการณ์..." rows="4" className={errors.comment ? 'invalid' : ''}/>
+          <textarea
+            value={formData.comment}
+            onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
+            rows="4"
+            className={errors.comment ? 'invalid' : ''}
+          />
           <div className="char-count">{formData.comment.length}/500 ตัวอักษร</div>
           {errors.comment && <span className="error">{errors.comment}</span>}
         </div>
+
         <div className="form-group">
           <label>วันที่เข้าร้าน</label>
-          <input type="date" value={formData.visitDate} onChange={(e) => setFormData({ ...formData, visitDate: e.target.value })} max={new Date().toISOString().split('T')[0]} />
+          <input
+            type="date"
+            value={formData.visitDate}
+            onChange={(e) => setFormData({ ...formData, visitDate: e.target.value })}
+            max={new Date().toISOString().split('T')[0]}
+          />
         </div>
-        <button type="submit" disabled={submitting}>{submitting ? 'กำลังส่ง...' : 'ส่งรีวิว'}</button>
+
+        <button type="submit" disabled={submitting}>
+          {submitting ? 'กำลังส่ง...' : 'ส่งรีวิว'}
+        </button>
       </form>
     </div>
   );
 }
+
 export default ReviewForm;

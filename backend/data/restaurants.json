@@ -1,15 +1,28 @@
 [
   {
     "id": 1,
-    "name": "ข้าวมันไก่ประตูน้ำ",
+    "name": "โกปี๊ฮับ ติ่มซำ-ชาชัก",
     "category": "อาหารไทย",
-    "description": "ข้าวมันไก่หอม นุ่ม น้ำจิ้มรสเด็ด",
-    "location": "เชียงใหม่",
-    "priceRange": 2,
-    "image": "https://picsum.photos/300",
+    "description": "ร้านสุดชิคกับติ่มซำ ชาชัก และอาหารกว่า 80 รายการ",
+    "location": "บางแสน, ชลบุรี",
     "phone": "081-234-5678",
     "openHours": "08:00 - 20:00",
+    "priceRange": 2,
+    "image": "https://images.unsplash.com/photo-1600891964599-f61ba0e24092",
+    "averageRating": 4.7,
+    "totalReviews": 3
+  },
+  {
+    "id": 2,
+    "name": "ราเมงฮาโกะ",
+    "category": "อาหารญี่ปุ่น",
+    "description": "ราเมงรสเข้มข้นจากเชฟญี่ปุ่นแท้ เส้นสดทำเองทุกวัน",
+    "location": "เชียงใหม่",
+    "phone": "082-999-1122",
+    "openHours": "10:30 - 22:00",
+    "priceRange": 3,
+    "image": "https://images.unsplash.com/photo-1600891964599-f61ba0e24092",
     "averageRating": 4.5,
-    "totalReviews": 12
+    "totalReviews": 5
   }
 ]

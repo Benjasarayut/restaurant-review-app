@@ -9,9 +9,11 @@ const { readJsonFile } = require('./utils/fileManager');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// Routes
 app.get('/', (req, res) => {
   res.json({
     message: '🍜 Restaurant Review API',
@@ -27,6 +29,9 @@ app.get('/', (req, res) => {
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/reviews', reviewRoutes);
 
+// ========================================
+// GET /api/stats - ดึงสถิติทั้งหมด
+// ========================================
 app.get('/api/stats', async (req, res) => {
   try {
     const restaurants = await readJsonFile('restaurants.json');
@@ -35,34 +40,43 @@ app.get('/api/stats', async (req, res) => {
     const totalRestaurants = restaurants.length;
     const totalReviews = reviews.length;
 
-    const rated = restaurants.filter(r => typeof r.averageRating === 'number' && r.averageRating > 0);
-    const averageRating =
-      rated.length > 0
-        ? Math.round((rated.reduce((s, r) => s + r.averageRating, 0) / rated.length) * 10) / 10
-        : 0;
+    const ratedRestaurants = restaurants.filter(r => r.totalReviews > 0);
+    const averageRating = ratedRestaurants.length > 0
+      ? (ratedRestaurants.reduce((sum, r) => sum + r.averageRating, 0) / ratedRestaurants.length).toFixed(1)
+      : 0;
 
     const topRatedRestaurants = [...restaurants]
-      .sort((a, b) => {
-        if (b.averageRating !== a.averageRating) return b.averageRating - a.averageRating;
-        if (b.totalReviews !== a.totalReviews) return b.totalReviews - a.totalReviews;
-        return a.name.localeCompare(b.name, 'th');
-      })
+      .filter(r => r.totalReviews > 0)
+      .sort((a, b) => b.averageRating - a.averageRating)
       .slice(0, 5);
 
     res.json({
       success: true,
-      data: { totalRestaurants, totalReviews, averageRating, topRatedRestaurants }
+      data: {
+        totalRestaurants,
+        totalReviews,
+        averageRating: parseFloat(averageRating),
+        topRatedRestaurants
+      }
     });
   } catch (error) {
     console.error('Error fetching stats:', error);
-    res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการดึงสถิติ' });
+    res.status(500).json({
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการดึงสถิติ'
+    });
   }
 });
 
+// 404 Handler
 app.use('*', (req, res) => {
-  res.status(404).json({ success: false, message: 'API endpoint not found' });
+  res.status(404).json({
+    success: false,
+    message: 'API endpoint not found'
+  });
 });
 
+// Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({

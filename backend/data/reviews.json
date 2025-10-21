@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": 101,
+    "restaurantId": 1,
+    "userName": "Ben",
+    "rating": 5,
+    "comment": "บรรยากาศดี ติ่มซำอร่อยมาก ชาชักเข้มข้น!",
+    "visitDate": "2025-10-01",
+    "createdAt": "2025-10-01T10:00:00Z"
+  },
+  {
+    "id": 102,
+    "restaurantId": 2,
+    "userName": "Aom",
+    "rating": 4,
+    "comment": "ราเมงเข้มข้น เส้นเหนียวนุ่ม ชอบมากค่ะ",
+    "visitDate": "2025-10-05",
+    "createdAt": "2025-10-05T11:00:00Z"
+  }
+]
